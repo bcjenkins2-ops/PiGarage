@@ -1,0 +1,519 @@
+# PiGarage — Bill of Materials (BOM) Reference
+**Last updated: 2026-03-17 (rev 13)**
+
+All SMT parts assembled by JLCPCB PCBA unless noted.
+
+**Hand-solder (4 through-hole parts):**
+- 40-pin GPIO header 2×20
+- Molex Mini-Fit Jr 6-pin car harness header
+- Molex Mini-Fit Jr 4-pin ADC header
+- PJ-320B 3.5mm TRS audio jack
+
+**Wire-side parts (DigiKey — see Section 7 for full shopping list):**
+- Discrete cable assemblies: cut in half for colour-coded pigtails
+
+---
+
+## SECTION 1 — POWER INPUT & PROTECTION
+
+**7.5A ATO/ATC fuse is installed in the car harness before J1, not on the PCB. Document only — no schematic symbol.**
+
+### 2. SMBJ18CA/TR13 — TVS Diode
+- **JLCPCB:** C78413
+- **Package:** SMB (DO-214AA)
+- **Mfr:** Brightking
+- **Rating:** 600W, 18V standoff, BIDIRECTIONAL
+- **Stock:** ~62,000
+- **Notes:** BIDIRECTIONAL essential 
+
+### 2b. SS56 — Catch (Freewheeling) Schottky Diode
+- **JLCPCB:** C466505
+- **Package:** SMA (DO-214AC)
+- **Mfr:** High Diode
+- **Specs:** 60V, 5A, Vf 0.7V typ @ 5A, -55 to +125°C
+- **Notes:** REQUIRED — TPS54560B is asynchronous (high-side MOSFET only). External catch diode provides freewheeling path for inductor current when high-side FET turns off. Without this diode the converter will not function. Connect anode to GND, cathode to SW pin. Place as close to buck IC as possible with short, wide traces. TI reference design uses B560C-13-F (equivalent specs). Diode dominates thermal budget (~2W at full load) — ensure adequate copper pour under thermal pad.
+
+---
+
+## SECTION 2 — BUCK CONVERTER (12V → 5V @ 5A)
+
+**Compensation verified:**
+```
+fz = 1/(2*pi*15k*1n)  = 10.6kHz  (loop zero, phase boost)
+fp = 1/(2*pi*15k*47p) = 225kHz   (HF pole, noise rejection)
+Target fc ~ 50kHz (fsw/10)
+```
+
+### 3. TPS54560BQDDARQ1 — Buck Converter IC
+- **JLCPCB:** C2072188
+- **Package:** SOP-8-EP
+- **Mfr:** Texas Instruments
+- **Specs:** 4.5-60V in, 5A out, AEC-Q100, 500kHz
+- **Stock:** ~1,271
+
+### 4. Sunlord MWSA1204S-100MT — Inductor 10µH
+- **JLCPCB:** C7009499
+- **Package:** SMD 13.5×12.8mm
+- **Specs:** 10µH, Isat 10A, Irms 8A, DCR 25mΩ, -40 to +125°C
+- **Stock:** ~267
+
+### 5. JIERB MA35V47M6X6 — 47µF Solid Polymer Electrolytic
+- **JLCPCB:** C46550468
+- **Package:** SMD 6.3×5.7mm cylindrical
+- **Specs:** 47µF, 35V, ESR 35mΩ, ripple 2650mA, -55 to +105°C
+- **Stock:** ~5,064
+- **Notes:** Do NOT substitute standard aluminium electrolytic. 35V on 5V rail = 7× derating. Est. lifetime ~32,000hr @ 65°C.
+
+### 6. Capacitor — 1µF X7R 0402 (HF bypass parallel with item 5)
+- **JLCPCB:** C52923
+- **Mfr:** YAGEO CC0402KRX7R6BB105
+- **Specs:** 1µF, 10V, X7R, 0402
+- **Stock:** ~153,000
+
+### 7. Resistor — 52.3kΩ (R_high, feedback divider)
+- **JLCPCB:** C26982
+- **Mfr:** UNI-ROYAL 0402WGF5232TCE
+- **Specs:** 52.3kΩ, 1%, 0402 | Stock: ~68,000
+- **Notes:** Vout = 0.8 × (1 + 52.3k/10k) = 4.984V
+
+### 8. Resistor — 10kΩ (R_low, feedback divider)
+- **JLCPCB:** C25744
+- **Mfr:** UNI-ROYAL 0402WGF1002TCE
+- **Specs:** 10kΩ, 1%, 0402 | Stock: ~3,000,000
+- **Notes:** Also used for UVLO R_b2, GPIO opto resistors (×4), PCM5122 ADR2 (to GND), ADR1 (to DVDD), XSMT (to 3.3V), ADS1115 ADDR + input protection. Many instances total (×14).
+
+### 9. Resistor — 200kΩ (RT, switching frequency)
+- **JLCPCB:** C25764
+- **Mfr:** UNI-ROYAL 0402WGF2003TCE
+- **Specs:** 200kΩ, 1%, 0402 | Stock: ~368,000
+- **Notes:** RT/CLK pin to GND → fsw = 500kHz.
+
+### 10. Capacitor — 100nF X7R 0402 (BOOT pin)
+- **JLCPCB:** C307331
+- **Mfr:** Samsung CL05B104KB54PNC
+- **Specs:** 100nF, 50V, X7R, 0402
+- **Notes:** BOOT cap sits between BOOT and SW pins per datasheet. Voltage across cap = ~5.4V (bootstrap charge), NOT 19.8V to GND. C307331 (50V) provides 9.3× derating. DAC decoupling caps (items 28, 32, 33, 35, 41) use C1525 (16V) — fine.
+
+### 10b. Capacitor — 10µF 25V X5R 0805 (VIN bulk input capacitor)
+- **JLCPCB:** C15850
+- **Mfr:** Samsung CL21A106KAYNNNE
+- **Specs:** 10µF, 25V, X5R, 0805
+- **Notes:** Required per TPS54560 datasheet. Place directly next to U2 VIN pin. Harness inductance causes VIN ringing on switch transitions without local bulk cap. 25V rating confirmed safe for 14.4V automotive VIN.
+
+### 11. Resistor — 15kΩ (R_comp)
+- **JLCPCB:** C25756
+- **Mfr:** UNI-ROYAL 0402WGF1502TCE
+- **Specs:** 15kΩ, 1%, 0402 | Stock: ~2,600,000
+
+### 12. Capacitor — 1nF C0G/NP0 0402 (C_comp)
+- **JLCPCB:** C1523
+- **Mfr:** YAGEO CC0402JRNPO9BN102
+- **Specs:** 1nF, 50V, C0G/NP0, 0402 | Stock: ~196,000
+- **Notes:** Loop zero at ~10kHz. MUST be C0G/NP0. (Item 44 is no longer this part — changed to 2.2nF.)
+
+### 13. Capacitor — 47pF C0G/NP0 0402 (C_pole)
+- **JLCPCB:** C1567
+- **Mfr:** CCTC TCC0402C0G470J500AT
+- **Specs:** 47pF, 50V, C0G, 0402 | Stock: ~372,000
+- **Notes:** HF pole at ~225kHz. In parallel with R_comp+C_comp to GND.
+
+---
+
+## SECTION 3 — POWER MANAGEMENT LATCH
+
+**Topology:** Diode-OR on EN pin. Two independent sources can hold EN HIGH:
+- (A) ACC 12V via resistor divider → D1 → EN (V_EN = 1.76V)
+- (B) BCM25 3.3V via 4.7kΩ series → D2 → EN
+
+BAT54CLT1G (SOT-23 common-cathode dual Schottky):
+- Anode 1 (pin 1) = D1 ← ACC divider output
+- Anode 2 (pin 3) = D2 ← BCM25 via 4.7kΩ
+- Cathode (pin 2) = EN node (shared)
+
+**WHY TWO DIODES ARE REQUIRED:**
+- D1 prevents ACC divider from pulling EN LOW when ACC turns off. Without D1: BCM25 fights (100k+22k) to GND at EN, V_EN drops to 0.58V.
+- D2 prevents ACC from back-feeding BCM25 when Pi drives it LOW. Without D2: ACC holds BCM25 at 2.16V, shutdown is impossible.
+
+**BOOT BEHAVIOUR (BCM25 high-Z, Pi booting):**
+Only ACC holds EN via D1 at 1.76V > 1.2V threshold. Pi boots normally. If ACC drops during boot: EN decays in τ≈180ms, Pi loses power. This is correct behaviour — user turned off ignition. NO Pi 3.3V pull-up is used. Reason: Pi 3.3V pull-up creates a path that prevents BCM25 LOW from ever cutting power (circular dependency).
+
+**SHUTDOWN BEHAVIOUR:**
+BCM25 driven LOW → D2 reverse biases → EN decays through forward-biased D1 via divider resistors (22kΩ ∥ 100kΩ = 18kΩ) to GND. τ = 10µF × 18kΩ = 180ms. Buck disables in ~170ms. Note: this only works when ACC is off (D1 anode at 0V, D1 forward biases). If ACC is still active, D1 anode sits at 2.16V and holds EN above the 1.1V disable threshold — software shutdown while ACC on is not possible (see Known Limitations).
+
+**UVLO OVERRIDE (see Section 4):**
+NPN collector pulls EN to ~0.1V when battery < 12V. 4.7kΩ series R on BCM25 limits GPIO current to 0.64mA when UVLO fires. UVLO reliably cuts power when BCM25 is high-Z (Pi halted or crashed). At 4.7kΩ: I_BCM25 = 0.574mA << NPN I_C_max 2.15mA → NPN wins.
+
+### 14. BAT54CLT1G — Dual Schottky Common Cathode (D1 + D2)
+- **JLCPCB:** C14308
+- **Package:** SOT-23
+- **Mfr:** onsemi
+- **Specs:** 30V, 200mA, Vf=0.8V@100mA, -55 to +125°C
+- **Stock:** ~127,879
+- **Notes:** Pin 1=D1 anode (ACC), pin 3=D2 anode (BCM25), pin 2=EN.
+
+### 15. Resistor — 100kΩ (ACC divider top / EN pull-down)
+- **JLCPCB:** C25741
+- **Mfr:** UNI-ROYAL 0402WGF1003TCE
+- **Specs:** 100kΩ, 1%, 0402 | Stock: ~4,000,000
+- **Notes:** ACC 12V → 100k/22k divider → D1. V_divider = 2.16V at 12V. When ACC is off (0V), this resistor + 22kΩ form the EN discharge path through forward-biased D1 (effective R = 22k∥100k = 18kΩ). No dedicated EN-to-GND pull-down exists.
+
+### 16. Resistor — 22kΩ (ACC divider bottom)
+- **JLCPCB:** C25768
+- **Mfr:** UNI-ROYAL 0402WGF2202TCE
+- **Specs:** 22kΩ, 1%, 0402 | Stock: ~377,000
+- **Notes:** Also used for UVLO TL431 divider bottom (item 23).
+
+### 17. Resistor — 4.7kΩ (BCM25 series protection)
+- **JLCPCB:** C25900
+- **Mfr:** UNI-ROYAL 0402WGF4701TCE
+- **Specs:** 4.7kΩ, 1%, 0402 | Stock: ~1,000,000+
+- **Notes:** Raised from 1kΩ to ensure UVLO NPN wins with thick margin if BCM25 sticks HIGH. At 1kΩ: NPN barely wins (1.7mA vs 2.15mA at V_EN=1.1V — thin margin). At 4.7kΩ: NPN wins easily (0.36mA vs 2.15mA — thick margin). ✓ GPIO current when UVLO fires: (3.3-0.3)/4.7k = 0.64mA (safer). EN rise time when BCM25 HIGH: τ = 4.7k × 10µF = 47ms (acceptable). C11702 (1kΩ) still used for R_k in UVLO section (item 24).
+
+### 18. Capacitor — 10µF 0805 (EN hold-up / crank ride-through)
+- **JLCPCB:** C15850
+- **Mfr:** YAGEO CC0805KKX7R7BB106
+- **Specs:** 10µF, 16V, X7R, 0805 | Stock: ~292,000
+- **Notes:** Shutdown: τ = 10µF × 18kΩ (22k∥100k through D1) = 180ms. Crank ride-through: during boot (before BCM25 asserts), EN cap held by TPS54560B internal 4.6µA pullup — barely decays during 500ms crank dip. Once BCM25 active, BCM25 holds EN regardless of ACC dips. Also used ×4 for DAC decoupling (items 29, 34, 36, 40).
+
+### 19. MMBT3904 — NPN Transistor (UVLO output stage)
+- **JLCPCB:** C20526
+- **Package:** SOT-23 | Stock: ~1,300,000
+- **Notes:** Collector → EN node. Emitter → GND. Pulls EN to ~0.1V (< 1.1V disable threshold) when UVLO fires.
+
+---
+
+## SECTION 4 — LOW VOLTAGE HARD CUTOFF (UVLO)
+
+Hardware 12V cutoff, no microcontroller required. Protects battery from deep discharge if Pi crashes with BCM25 high-Z.
+
+**TL431 behaviour (open-loop comparator mode — no cathode-to-REF feedback):**
+- V_BAT > 12.1V (good): TL431 conducts, V_cathode ≈ 2.0V typical (comparator VOL per TI SLVA987A; worst-case 2.5V)
+- V_BAT < 12.1V (low): TL431 off, V_cathode → 5V via R_k
+
+**NPN base divider translates this (R_b1=47kΩ, R_b2=10kΩ):**
+- Battery GOOD (typical): V_base = 2.0 × 10/(47+10) = 0.351V < 0.7V → NPN OFF [margin: 349mV @ 25°C]
+- Battery GOOD (worst-case V_cathode=2.5V): V_base = 0.439V [margin: 261mV @ 25°C]
+- Battery BAD: V_base = 5.0 × 10/(47+10) = 0.877V > 0.7V → NPN ON
+
+**Verified over temperature (-40 to +125°C, Vbe from 0.85V to 0.45V):**
+- +125°C, battery good (typical): V_base = 0.351V vs Vbe=0.45V → NPN OFF (99mV margin)
+- +125°C, battery good (worst-case): V_base = 0.439V vs Vbe=0.45V → NPN OFF (11mV margin)
+- +125°C, battery bad: I_B = (5.0-0.45)/47k - 0.45/10k = 51.8µA → I_C = hFE × I_B = 50 × 51.8µA = 2.59mA >> 96µA (ACC source) → saturates
+
+**NOTE:** At +125°C the worst-case NPN-off margin is 11mV (if V_cathode = 2.5V); typical is ~99mV (V_cathode ≈ 2.0V). This is an extreme case for a fan-cooled in-car install (typical 40-70°C where margins are 250–400mV). Adequate for v1; use comparator IC for v2.
+
+**Threshold math:**
+```
+V_cutoff = 2.495 × (84.5k + 22k)/22k = 12.08V
+TL431 minimum cathode current: I_k = (5-2.0)/1k = 3.0mA > 1mA minimum. ✓
+  (worst-case at V_cathode=2.5V: I_k = 2.5mA > 1mA ✓)
+```
+
+**Blanking cap on TL431 REF pin:**
+```
+τ = (Ra||Rb) × C = 17.6kΩ × 47µF = 827ms
+Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
+```
+
+### 20. TL431AQDBZR — Adjustable Shunt Regulator
+- **JLCPCB:** C105255
+- **Package:** SOT-23-3
+- **Mfr:** Texas Instruments
+- **Specs:** AEC-Q100, -40 to +125°C
+- **Stock:** ~5,492
+
+### 21. Resistor — 84.5kΩ (TL431 divider top R_a)
+- **JLCPCB:** C26988
+- **Mfr:** UNI-ROYAL 0402WGF8452TCE
+- **Specs:** 84.5kΩ, 1%, 0402 | Stock: ~34,950
+- **Notes:** Sets 12.1V cutoff threshold.
+
+### 22. Resistor — 22kΩ (TL431 divider bottom R_b)
+- **JLCPCB:** C25768 (same as item 16)
+
+### 23. Resistor — 1kΩ (R_k, TL431 cathode pull-up from 5V)
+- **JLCPCB:** C11702
+- **Notes:** 5V → R_k → TL431 cathode → GND (through TL431 when bat good).
+
+### 24. Resistor — 47kΩ (R_b1, NPN base divider top)
+- **JLCPCB:** C25792
+- **Mfr:** UNI-ROYAL 0402WGF4702TCE
+- **Specs:** 47kΩ, 1%, 0402 | Stock: ~3,200,000
+
+### 25. Resistor — 10kΩ (R_b2, NPN base divider bottom)
+- **JLCPCB:** C25744 (same as item 8)
+
+### 26. Capacitor — 47µF X5R 0805 (TL431 REF blanking cap)
+- **JLCPCB:** C16780
+- **Notes:** τ = 17.6kΩ × 47µF = 827ms. Handles cold crank ~500ms with margin.
+
+---
+
+## SECTION 5 — AUDIO DAC
+
+**Power domains:**
+- AVDD (3.3V) ← AP2112K LDO (item 31), fed via ferrite (item 30) from 5V rail
+- DVDD (3.3V) ← Pi 3.3V rail directly (Pi's own regulator)
+- CPVDD (3.3V) ← Pi 3.3V rail directly (same source as DVDD)
+
+**AGND:** All ground connections in the audio section (U1, U4, J3, C9-C14, C16, C18-C20, C24, R15, R16) use a separate AGND net connected to main GND via a net tie at a single star ground point near the GPIO header.
+
+**Control pin wiring (no BOM items — direct traces in schematic):**
+- MODE1 (pin 17) → DGND — selects I2C control mode (MODE1=LOW, MODE2=HIGH)
+- MODE2 (pin 18) → DVDD — selects I2C control mode
+- SCK (pin 20) → DGND — required for 3-wire I2S (BCK PLL mode). Device auto-detects missing SCK after 16 LRCK periods and starts internal PLL from BCK. Floating SCK may prevent reliable PLL lock.
+- GPIO3 (pin 15), GPIO4 (pin 14), GPIO5 (pin 13), GPIO6 (pin 19) → leave unconnected (internal pull-downs in I2C mode)
+
+### 27. PCM5122PWR — Audio DAC
+- **JLCPCB:** C962071
+- **Package:** TSSOP-28 *** 28-pin, NOT 20-pin ***
+- **Mfr:** Texas Instruments
+- **Specs:** 112dB SNR, I2S, I2C. Supply: AVDD/CPVDD/DVDD all 3.3V (abs max 3.9V — do NOT connect any pin to 5V)
+- **Stock:** ~107
+- **GPIO:** BCM18 BCLK, BCM19 LRCLK, BCM21 DOUT→DIN (Pi's PCM_DOUT sends audio to PCM5122 DIN pin 22. BCM20 PCM_DIN not connected — DAC has no data output in I2C mode)
+- **I2C addr:** 0x4D (ADR1=DVDD, ADR2=GND — matches HiFiBerry DAC+ pinout. See items 37/38)
+- **Notes:** C9034 is a microcontroller — completely wrong part. Driver controls XSMT and format via I2C. HiFiBerry DAC+ overlay chosen for maximum ecosystem compatibility (Volumio, Moode, LibreELEC, etc.). No on-board oscillator — DAC runs in slave mode (Pi generates BCK/LRCK, PCM5122 PLL derives internal clocks from BCK).
+- **config.txt overlay (choose ONE based on Pi model):**
+  - Pi 4 and older: `dtoverlay=hifiberry-dacplus` (driver auto-detects slave mode)
+  - Pi 5: `dtoverlay=hifiberry-dacplus-std` (Pi 5 cannot dynamically switch clock direction; slave must be set at load time. Alternatively: `dtoverlay=hifiberry-dacplus,slave`)
+
+### 28. Capacitor — 100nF X7R 0402 (AVDD decoupling)
+- **JLCPCB:** C1525
+
+### 29. Capacitor — 10µF 0805 (AVDD bulk)
+- **JLCPCB:** C15850 (same as item 18)
+
+### 30. GZ1608D601TF — Ferrite Bead (AVDD supply isolation)
+- **JLCPCB:** C1002
+- **Package:** 0603 | Mfr: Sunlord
+- **Specs:** 600Ω @ 100MHz, 200mA, 450mΩ DCR | Stock: ~698,000
+
+### 31. AP2112K-3.3TRG1 — Ultra-Low-Noise LDO (DAC AVDD)
+- **JLCPCB:** C51118
+- **Package:** SOT-25-5 | Mfr: Diodes Incorporated
+- **Specs:** 3.3V, 600mA, 50µVrms noise, 65dB PSRR@1kHz | Stock: ~196,000
+- **Notes:** EN (pin 3) tied to VIN (pin 1) for always-on operation. EN has 3MΩ internal pull-down — will be OFF if left floating.
+
+### 31b. Capacitor — 1µF X7R 0402 (AP2112K LDO input decoupling) *** NEW ITEM ***
+- **JLCPCB:** C52923 (same as items 6, 42)
+- **Specs:** 1µF, 10V, X7R, 0402
+- **Notes:** Required per AP2112K datasheet (CIN ≥ 1µF). Place between ferrite bead output (item 30) and LDO VIN pin (item 31). Without this cap, ferrite HF attenuation is degraded and LDO line transient response suffers.
+
+### 32. Capacitor — 100nF X7R 0402 (AVDD LDO output decoupling)
+- **JLCPCB:** C1525
+
+### 33. Capacitor — 100nF X7R 0402 (DVDD decoupling, Pi 3.3V rail)
+- **JLCPCB:** C1525
+
+### 34. Capacitor — 10µF 0805 (DVDD bulk)
+- **JLCPCB:** C15850 (same as item 18)
+
+### 35. Capacitor — 100nF X7R 0402 (CPVDD decoupling)
+- **JLCPCB:** C1525
+- **Notes:** CPVDD is DAC charge pump supply input. Sourced from Pi 3.3V rail (NOT 5V — abs max 3.9V).
+
+### 36. Capacitor — 10µF 0805 (CPVDD bulk)
+- **JLCPCB:** C15850 (same as item 18)
+
+### 37. Resistor — 10kΩ to DVDD (PCM5122 ADR1 pin 24, I2C address bit 0) *** CHANGED from GND to DVDD ***
+- **JLCPCB:** C25744 (same as item 8)
+- **Notes:** MUST NOT float. ADR1=DVDD, ADR2=GND → address 0x4D (matches HiFiBerry DAC+ for maximum overlay/driver compatibility).
+
+### 38. Resistor — 10kΩ to GND (PCM5122 ADR2 pin 16, I2C address bit 1)
+- **JLCPCB:** C25744 (same as item 8)
+
+### 39. Resistor — 10kΩ to 3.3V (PCM5122 XSMT pin 25)
+- **JLCPCB:** C25744 (same as item 8)
+- **Notes:** XSMT LOW = muted. Pull HIGH ensures audio passes even without driver. hifiberry-dacplus overlay also controls via I2C on boot.
+
+### 40. Capacitor — 10µF 0805 (VNEG pin 5 decoupling — negative charge pump rail)
+- **JLCPCB:** C15850 (same as item 18)
+- **Notes:** PCM5122 VNEG pin 5. Negative rail ~-3.3V from charge pump. Required for pump stability.
+
+### 41. Capacitor — 100nF X7R 0402 (LDOO pin 26 decoupling)
+- **JLCPCB:** C1525
+- **Notes:** PCM5122 internal 1.8V LDO output pin. Must be decoupled to GND.
+
+### 42. Capacitor — 1µF X7R 0402 (CAPM/CAPP flying capacitor)
+- **JLCPCB:** C52923 (same as item 6)
+- **Notes:** Charge pump flying cap. Connected BETWEEN CAPP (pin 2) and CAPM (pin 4) — NOT to GND. Both pins float if this is omitted. VCOM (pin 10): wire to GND directly, NO cap required. Default VREF mode needs no decoupling on VCOM.
+
+### 43. Resistor — 470Ω 0402 1% (RC filter series R, ×2 one per channel)
+- **JLCPCB:** C25117
+- **Mfr:** UNI-ROYAL 0402WGF4700TCE
+- **Specs:** 470Ω, 1%, 0402 | Stock: ~430,000
+- **Notes:** All PCM5122 datasheet performance specs (112dB SNR, -93dB THD+N) are measured with 470Ω + 2.2nF. Provides better out-of-band noise attenuation (~10dB at 500kHz vs ~0dB with 100Ω).
+
+### 44. Capacitor — 2.2nF C0G/NP0 0603 50V (RC filter shunt C, ×2 one per channel) *** CHANGED from 1nF 0402 ***
+- **JLCPCB:** C1604
+- **Mfr:** Murata GCM1885C1H222JA16D
+- **Specs:** 2.2nF, 50V, C0G/NP0, 5%, 0603 | Stock: ~5,300
+- **Notes:** fc = 1/(2×π×470×2.2n) = 154kHz. MUST be C0G/NP0 — X7R is voltage-dependent and introduces measurable audio distortion. Fallback: two 1nF C0G 0402 (C113780) in parallel per channel (gives 2.0nF, fc = 170kHz).
+
+### 45. PJ-320B — 3.5mm TRS Audio Jack
+- **JLCPCB:** C22355831
+- **Package:** SMD, 3-pin TRS | Mfr: SHOU HAN
+- **KiCad FP:** PJ-320B:BOOMELE_PJ-320B
+- **Notes:** Pin 1=Sleeve(GND), Pin 2=Tip(Left), Pin 3=Ring(Right). Only L/R/GND needed — no mic pin. Hand-soldered. Use 3.5mm→RCA adapter if RCA output needed.
+
+---
+
+## SECTION 6 — GPIO SENSE INPUTS (×4 channels)
+
+### *** OPEN SOURCE / COMMUNITY BUILD (canonical) ***
+
+All four channels are identical sense inputs. BCM24 (AUX) is a spare input — use for any 12V car signal or leave unpopulated.
+
+**Optoisolator circuit per channel (all four identical):**
+```
+Car 12V → 10kΩ → Anode (pin 1) → Cathode (pin 2) → Car GND
+Pi internal pull-up (~50kΩ) → Collector (pin 4) → GPIO
+Emitter (pin 3) → Pi GND
+```
+
+**Logic (ALL FOUR channels, same polarity):**
+- Car signal 12V: LED on → transistor on → GPIO LOW (active)
+- Car signal 0V: LED off → transistor off → GPIO HIGH (inactive)
+- Handle any inversion in software. No hardware difference between channels.
+
+```
+LED current:   (12 - 1.2V) / 10kΩ = 1.08mA (adequate for FOD817BSD CTR rank B, 130% min)
+GPIO current:  3.3V / 50kΩ = 66µA — transistor saturates, GPIO = ~0.1V
+```
+
+**GPIO assignments:**
+- BCM27 — ACC (ignition sense)
+- BCM17 — REV (reverse gear)
+- BCM22 — ILL (illumination / headlights)
+- BCM24 — AUX (spare input, user-defined)
+
+### 46. LTV-817S-TA1-C — Optoisolator ×4
+- **JLCPCB:** C109227
+- **Package:** SMD-4P | Mfr: Lite-On
+- **Specs:** 5kV isolation, 50mA, 70V Vceo, CTR rank C (200–400%) | Stock: ~248,000
+
+### 47. Resistor — 10kΩ ×4 (car-side LED current limit, all channels)
+- **JLCPCB:** C25744 (same as item 8)
+- **Notes:** Changed from 1kΩ. LED current = (12-1.2)/10k = 1.08mA. Adequate for FOD817.
+
+### 48. Capacitor — 100nF ×4 (car-side debounce filter, in parallel with LED)
+- **JLCPCB:** C1525
+- **Notes:** RC filter: τ = 10kΩ × 100nF = 1ms. Filters noise/spikes on car signal. Place across opto LED pins (pin 1 to pin 2).
+
+### *** NO external pull-up resistors on GPIO side ***
+Pi internal pull-ups used instead (~50kΩ, enabled in software). Collector connects directly to GPIO net label. Emitter to GND.
+```
+GPIO.setup(pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+```
+This is handled automatically by the PiGarage-monitor daemon on boot.
+
+---
+
+## SECTION 6b — ANALOG-TO-DIGITAL CONVERTER (ADS1115)
+
+On-board 16-bit ADC for steering wheel button resistor ladder and general-purpose analog inputs. Powered from Pi 3.3V rail (150µA typical). Shared I2C bus with PCM5122 DAC — no additional GPIO pins used.
+
+I2C address: 0x48 (ADDR to GND). No conflict with PCM5122 at 0x4D.
+
+All four analog inputs (A0–A3) routed to the 4-pin Molex connector (item 51). Power and GND come from the board — no power pins on the connector. AIN0 and AIN1 each have a 4.7kΩ pull-up to 3.3V for resistor ladder excitation. AIN2/AIN3 have no pull-ups by default — users can populate if needed for additional resistor ladder channels. All inputs have 10kΩ series protection resistors.
+
+### 52. ADS1115IRUGR — 16-bit ADC
+- **JLCPCB:** C2651328
+- **Package:** QFN-10 (2mm × 1.5mm)
+- **Mfr:** Texas Instruments
+- **Specs:** 16-bit, 860 SPS, 4-channel MUX, PGA ±0.256V to ±6.144V, I2C, 2V–5.5V supply
+- **Notes:** Shared I2C bus with PCM5122 (BCM2 SDA, BCM3 SCL). Address 0x48 (ADDR to GND). ALRT pin (pin 2) left unconnected — internal pull-up present. Pi on-board 1.8kΩ I2C pull-ups adequate for combined bus. Linux driver: `ads1015` IIO driver or Adafruit_ADS1x15 Python library.
+
+### 53. Capacitor — 100nF X7R 0402 (ADS1115 VDD decoupling)
+- **JLCPCB:** C1525 (same as items 28, 32, 33, 35, 41, 48)
+- **Notes:** Place directly at ADS1115 VDD pin 8.
+
+### 54. Resistor — 10kΩ (ADS1115 ADDR to GND)
+- **JLCPCB:** C25744 (same as items 8, 25, 37, 38, 39, 47)
+- **Notes:** Sets I2C address to 0x48. Change destination for alternate addresses: VDD→0x49, SDA→0x4A, SCL→0x4B.
+
+### 55. Resistor — 4.7kΩ ×2 (AIN0 + AIN1 pull-ups to 3.3V, resistor ladder excitation) *** UPDATED ×1→×2 ***
+- **JLCPCB:** C25900 (same as item 17)
+- **Notes:** Excitation for resistor ladder inputs on AIN0 and AIN1. No button pressed = input reads 3.3V. Button pressed = voltage divider with ladder resistance gives unique voltage per button. Value gives good spread across typical steering wheel ladder values (330Ω–3.3kΩ). AIN2/AIN3 have no pull-ups by default — populate additional 4.7kΩ if needed for more resistor ladder channels.
+
+### 56. Resistor — 10kΩ ×4 (A0–A3 series input protection)
+- **JLCPCB:** C25744 (same as item 54)
+- **Notes:** One per channel. Limits input current if analog input accidentally exposed to 12V: (12 − 3.6) / 10kΩ = 0.84mA, well below 10mA abs max. Negligible voltage error due to >10MΩ ADC input impedance.
+
+---
+
+## SECTION 7 — CONNECTORS & MECHANICAL
+
+### 49. 40-Pin GPIO Header (2×20)
+- **Notes:** Hand-solder. Standard RPi HAT through-hole connector.
+
+### 50. Car Harness Connector — Molex Mini-Fit Jr 6-pin (2×3)
+- **PCB header:** [0455580003](https://www.digikey.com/en/products/detail/molex/0455580003/3311349) (vertical, dual row, 4.2mm pitch, black LCP, glow-wire)
+- **Wire-side cable:** [0451350603](https://www.digikey.com/en/products/detail/molex/0451350603/6822677) — 6-circuit discrete cable, 300mm, colour-coded wires, housing pre-loaded. Cut in half → two pigtail harnesses.
+- **KiCad FP:** Connector_Molex:Molex_Mini-Fit_Jr_5566-06A_2x03_P4.20mm_Vertical
+- **Notes:** Mini-Fit Jr (4.2mm pitch), the standard ATX power connector. 13A per pin, -40 to +105°C. 2×3 dual row is compact and sturdy on the PCB (16.9mm wide). Hand-soldered.
+- **Pinout:** Pin 1: BAT+ / Pin 2: GND / Pin 3: ACC / Pin 4: ILL / Pin 5: REV / Pin 6: AUX
+
+### 51. ADC Analog Input Connector — Molex Mini-Fit Jr 4-pin (2×2)
+- **PCB header:** Molex 0462071004 (vertical, dual row, 4.2mm pitch, black LCP, glow-wire)
+- **Wire-side cable:** [0451350403](https://www.digikey.com/en/products/detail/molex/0451350403/6822667) — 4-circuit discrete cable, 300mm, colour-coded wires, housing pre-loaded. Cut in half → two pigtail harnesses.
+- **KiCad FP:** Connector_Molex:Molex_Mini-Fit_Jr_5566-04A_2x02_P4.20mm_Vertical
+- **Pinout:** Pin 1: A0 / Pin 2: A1 / Pin 3: A2 / Pin 4: A3
+- **Notes:** All four ADS1115 analog inputs routed to connector. Power (3.3V) and GND for the ADC come from the board — no power pins needed. Steering wheel users connect A0 only. Same Mini-Fit Jr family as car harness. Hand-soldered.
+
+### Molex Mini-Fit Jr — DigiKey Shopping List
+
+| Qty | Part | DigiKey Link | Description | ~Price |
+|-----|------|-------------|-------------|--------|
+| 2 | 0455580003 | [link](https://www.digikey.com/en/products/detail/molex/0455580003/3311349) | 6-pin PCB header, black LCP | $2.50 ea |
+| 2 | 0462071004 | search DigiKey | 4-pin PCB header, black LCP | $2.00 ea |
+| 1 | 0451350603 | [link](https://www.digikey.com/en/products/detail/molex/0451350603/6822677) | 6-ckt cable 300mm (cut in half → 2 pigtails) | ~$5 |
+| 1 | 0451350403 | [link](https://www.digikey.com/en/products/detail/molex/0451350403/6822667) | 4-ckt cable 300mm (cut in half → 2 pigtails) | ~$4 |
+
+Total: ~$16 for two complete connector sets with spares. One DigiKey order, no special tools.
+
+### J3 — PJ-320B 3.5mm TRS Audio Jack
+- **JLCPCB:** C22355831 — PJ-320B, SMD 3-pin TRS
+- **Notes:** Hand-solder onto board. Standard 3.5mm jack — use any TRS cable or 3.5mm→RCA adapter for amplifier connection.
+
+---
+
+## GPIO ALLOCATION (10 of 28 used, 18 free)
+
+| BCM | Function |
+|-----|----------|
+| 2 | I2C SDA (PCM5122 DAC + steering wheel controller) |
+| 3 | I2C SCL (PCM5122 DAC + steering wheel controller) |
+| 17 | REV sense |
+| 18 | I2S BCLK |
+| 19 | I2S LRCLK |
+| 20 | FREE (Pi PCM_DIN — not used, DAC has no data output) |
+| 21 | I2S DOUT (Pi transmits audio to PCM5122 DIN pin 22) |
+| 22 | ILL sense |
+| 24 | AUX (spare, user-defined) |
+| 25 | Power latch (HIGH = run, LOW = cut power) |
+| 27 | ACC sense |
+
+---
+
+## KNOWN LIMITATIONS (v1 — flag for v2)
+
+1. **UVLO NPN-OFF margin at +125°C: 11mV worst-case, ~99mV typical.** TL431 in comparator mode has VOL ≈ 2.0V (typical) giving 99mV margin, or 2.5V (worst-case) giving 11mV. Fan-cooled install typical temp 40-70°C — margin 250-400mV there. Fix for v2: use LMV331 or similar comparator with built-in reference, or add 470kΩ hysteresis resistor from cathode to divider junction.
+
+2. **Pi loses power if ignition turned off during the 20s boot window.** Normal use case (ignition on while Pi boots) unaffected. Not worth fixing: if user turns off ignition, expected behaviour is power loss.
+
+3. **UVLO cycling at battery cutoff.** When battery < 12.1V with ACC active, system cycles at ~8Hz (EN charge ~120ms + soft-start ~2ms per cycle). UVLO is powered from the 5V rail it disables, creating an inherent restart loop. Cycling is self-protective — prevents Pi from running and draining a dying battery. Battery drain during cycling is negligible (~2.5µA average). Verify on prototype. Fix for v2: add 470kΩ hysteresis resistor from TL431 cathode to Ra/Rb divider junction (~0.5V hysteresis band).
+
+4. **AP2112K PSRR at 500kHz is ~30–40dB, not 65dB.** The 65dB datasheet figure is at 1kHz only. Combined rejection is adequate (~70–90dB total). If noise is audible on prototype, upgrade AVDD LDO to TPS7A47 or LP5907.
+
+5. **Star ground layout is critical for audio quality.** Component choices give ~95–100dB rejection at 500kHz and >65dB PSRR at audio frequencies. Actual SNR depends entirely on PCB layout: star ground point placement, physical separation of buck from DAC, and no shared copper between switching return currents and audio ground. Must be enforced in KiCad layout.
+
+6. **AP2112K absolute maximum VIN is 6.0V (recommended operating max 5.5V).** Buck output is 4.984V, giving 0.5V margin to recommended max and 1.0V to absolute max. TPS54560B OVP at 109% (5.43V) should prevent excursions, but probe LDO input on prototype for transients above 5.5V. If seen, add small series resistor (1–10Ω) before LDO or upgrade to higher-VIN LDO.
+
+7. **AP2112K is commercial-grade (-40 to +85°C), not AEC-Q100.** Adequate for fan-cooled dash/under-seat install (typical 40–70°C, 15–45°C margin). For v2 full automotive-grade: consider TPS7A20 (TI, AEC-Q100) or equivalent.
+
+8. **Software shutdown while ACC (ignition) is active is not possible.** BCM25 LOW releases D2, but ACC divider continues holding EN above 1.1V threshold through D1. System stays powered until ignition is turned off. This is correct behaviour for a car head unit — power should not cut while driving. The UVLO (NPN) is the only override that works regardless of ACC state.
+
+9. **Power-on delay ~120ms from ignition on to buck enable.** EN cap (10µF) charges through D1 + divider impedance (18kΩ), τ = 180ms. EN reaches 1.1V threshold in ~120ms. Plus 2ms buck soft-start = ~122ms total before 5V rail is up. Negligible vs Pi boot time (seconds).
+
+10. **AGND and GND connected via net tie at single star point.** PCB layout must enforce separate copper pour islands for audio ground and power ground, bridged only at the star point near the GPIO header. Failure to maintain ground separation will couple buck switching noise into the audio output, degrading SNR below the ~100dB target.

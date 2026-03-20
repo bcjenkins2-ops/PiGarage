@@ -1,0 +1,43 @@
+# KiCad 9 temporary and backup files
+*.bak
+*.bck
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*.kicad_prl
+*.sch-bak
+*~
+_autosave-*
+*.tmp
+*-save.pro
+*-save.kicad_pcb
+*-backups/
+fp-info-cache
+*.lck
+#auto_saved_files#
+
+# KiCad netlist and autorouter exports
+*.net
+*.dsn
+*.ses
+*_erc.json
+*_netlist.xml
+DRC.rpt
+
+# OS junk
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Office temp files
+~$*
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
+
+# Claude Code local settings
+.claude/

@@ -1,0 +1,6 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "PCM5122PWR")(type "KiCad")(uri "${KIPRJMOD}/Libraries/PCM5122PWR.pretty")(options "")(descr "PCM5122PWR TSSOP-28 footprint"))
+  (lib (name "PJ-320D-A")(type "KiCad")(uri "${KIPRJMOD}/Libraries/PJ-320D-A.pretty")(options "")(descr "HRO PJ-320D-A 3.5mm TRS audio jack"))
+  (lib (name "PJ-320B")(type "KiCad")(uri "${KIPRJMOD}/Libraries/PJ-320B.pretty")(options "")(descr "PJ-320B 3.5mm TRS audio jack"))
+)
