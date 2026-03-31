@@ -1,5 +1,5 @@
 # PiGarage — Bill of Materials (BOM) Reference
-**Last updated: 2026-03-17 (rev 13)**
+**Last updated: 2026-03-31 (rev 14 — v0.2 WEBENCH redesign)**
 
 All SMT parts assembled by JLCPCB PCBA unless noted.
 
@@ -26,22 +26,23 @@ All SMT parts assembled by JLCPCB PCBA unless noted.
 - **Stock:** ~62,000
 - **Notes:** BIDIRECTIONAL essential 
 
-### 2b. SS56 — Catch (Freewheeling) Schottky Diode
-- **JLCPCB:** C466505
-- **Package:** SMA (DO-214AC)
-- **Mfr:** High Diode
+### 2b. B560C-13-F — Catch (Freewheeling) Schottky Diode
+- **JLCPCB:** C85100
+- **Package:** SMC (DO-214AB)
+- **Mfr:** Diodes Incorporated
 - **Specs:** 60V, 5A, Vf 0.7V typ @ 5A, -55 to +125°C
-- **Notes:** REQUIRED — TPS54560B is asynchronous (high-side MOSFET only). External catch diode provides freewheeling path for inductor current when high-side FET turns off. Without this diode the converter will not function. Connect anode to GND, cathode to SW pin. Place as close to buck IC as possible with short, wide traces. TI reference design uses B560C-13-F (equivalent specs). Diode dominates thermal budget (~2W at full load) — ensure adequate copper pour under thermal pad.
+- **Notes:** REQUIRED — TPS54560B is asynchronous (high-side MOSFET only). External catch diode provides freewheeling path for inductor current when high-side FET turns off. Without this diode the converter will not function. Connect anode to GND, cathode to SW pin. Place as close to buck IC as possible with short, wide traces. SMC package chosen over SMA for better thermal performance at sustained 5A (θJA ~45°C/W vs ~90°C/W). Diode dominates thermal budget (~2W at full load) — ensure adequate copper pour under thermal pad.
 
 ---
 
 ## SECTION 2 — BUCK CONVERTER (12V → 5V @ 5A)
 
-**Compensation verified:**
+**Compensation designed with TI WEBENCH (7-16V in, 5V/5A out, ~1.1MHz fsw):**
 ```
-fz = 1/(2*pi*15k*1n)  = 10.6kHz  (loop zero, phase boost)
-fp = 1/(2*pi*15k*47p) = 225kHz   (HF pole, noise rejection)
-Target fc ~ 50kHz (fsw/10)
+Rcomp = 23.7kΩ, Ccomp = 1.8nF, Ccomp2 = 8.2pF
+Rfbt = 60.4kΩ, Rfbb = 11.5kΩ → Vout = 0.8 × (1 + 60.4k/11.5k) = 5.0V
+Rt = 80.6kΩ → fsw ≈ 1.1MHz
+L1 = 2.2µH (molded/shielded)
 ```
 
 ### 3. TPS54560BQDDARQ1 — Buck Converter IC
@@ -51,71 +52,68 @@ Target fc ~ 50kHz (fsw/10)
 - **Specs:** 4.5-60V in, 5A out, AEC-Q100, 500kHz
 - **Stock:** ~1,271
 
-### 4. Sunlord MWSA1204S-100MT — Inductor 10µH
-- **JLCPCB:** C7009499
-- **Package:** SMD 13.5×12.8mm
-- **Specs:** 10µH, Isat 10A, Irms 8A, DCR 25mΩ, -40 to +125°C
-- **Stock:** ~267
+### 4. cjiang FXL0630-2R2-M — Inductor 2.2µH
+- **JLCPCB:** C167218 (Extended)
+- **Package:** SMD 7×6.6mm molded (shielded)
+- **Specs:** 2.2µH, Isat 10A, Irms 9.5A, DCR 15mΩ, ±20%
+- **Notes:** WEBENCH recommended 2.2µH for 7-16V input at ~1.1MHz fsw. Molded construction reduces EMI — important with DAC on same board. 10A Isat exceeds TPS54560B 7.5A peak current limit with margin. 15mΩ DCR gives 0.375W loss at 5A (better than previous 26.5mΩ).
 
-### 5. JIERB MA35V47M6X6 — 47µF Solid Polymer Electrolytic
-- **JLCPCB:** C46550468
-- **Package:** SMD 6.3×5.7mm cylindrical
-- **Specs:** 47µF, 35V, ESR 35mΩ, ripple 2650mA, -55 to +105°C
-- **Stock:** ~5,064
-- **Notes:** Do NOT substitute standard aluminium electrolytic. 35V on 5V rail = 7× derating. Est. lifetime ~32,000hr @ 65°C.
+### 5. Samsung CL31A476MPHNNNE — 47µF Ceramic Output Capacitor (×2)
+- **JLCPCB:** C96123 (Basic)
+- **Package:** 1206
+- **Specs:** 47µF, 10V, X5R, ±20%
+- **Stock:** ~497,515
+- **Qty:** 2 (in parallel on VOUT rail)
+- **Notes:** WEBENCH design at 1.1MHz requires ≥22.7µF effective output capacitance (load transient). 2× 47µF at 10V gives ~70-76µF effective after DC bias derating at 5V. 10V rating chosen per TI reference design for good capacitance retention at 5V output.
 
-### 6. Capacitor — 1µF X7R 0402 (HF bypass parallel with item 5)
-- **JLCPCB:** C52923
-- **Mfr:** YAGEO CC0402KRX7R6BB105
-- **Specs:** 1µF, 10V, X7R, 0402
-- **Stock:** ~153,000
+### 6. Capacitor — 1µF X5R 0603 (HF bypass parallel with item 5)
+- **JLCPCB:** C15849 (Basic)
+- **Mfr:** Samsung CL10A105KB8NNNC
+- **Specs:** 1µF, 50V, X5R, 0603
 
-### 7. Resistor — 52.3kΩ (R_high, feedback divider)
-- **JLCPCB:** C26982
-- **Mfr:** UNI-ROYAL 0402WGF5232TCE
-- **Specs:** 52.3kΩ, 1%, 0402 | Stock: ~68,000
-- **Notes:** Vout = 0.8 × (1 + 52.3k/10k) = 4.984V
+### 7. Resistor — 60.4kΩ (Rfbt, feedback divider top)
+- **JLCPCB:** C23089 (Extended)
+- **Specs:** 60.4kΩ, 1%, 0603
+- **Notes:** Vout = 0.8 × (1 + 60.4k/11.5k) = 5.0V. WEBENCH value.
 
-### 8. Resistor — 10kΩ (R_low, feedback divider)
-- **JLCPCB:** C25744
-- **Mfr:** UNI-ROYAL 0402WGF1002TCE
-- **Specs:** 10kΩ, 1%, 0402 | Stock: ~3,000,000
-- **Notes:** Also used for UVLO R_b2, GPIO opto resistors (×4), PCM5122 ADR2 (to GND), ADR1 (to DVDD), XSMT (to 3.3V), ADS1115 ADDR + input protection. Many instances total (×14).
+### 8. Resistor — 11.5kΩ (Rfbb, feedback divider bottom)
+- **JLCPCB:** C2930057 (Extended)
+- **Specs:** 11.5kΩ, 1%, 0603
 
-### 9. Resistor — 200kΩ (RT, switching frequency)
-- **JLCPCB:** C25764
-- **Mfr:** UNI-ROYAL 0402WGF2003TCE
-- **Specs:** 200kΩ, 1%, 0402 | Stock: ~368,000
-- **Notes:** RT/CLK pin to GND → fsw = 500kHz.
+### 9. Resistor — 80.6kΩ (RT, switching frequency)
+- **JLCPCB:** C23249 (Extended)
+- **Specs:** 80.6kΩ, 1%, 0603
+- **Notes:** RT/CLK pin to GND → fsw ≈ 1.1MHz. WEBENCH value for 7-16V input.
 
-### 10. Capacitor — 100nF X7R 0402 (BOOT pin)
-- **JLCPCB:** C307331
-- **Mfr:** Samsung CL05B104KB54PNC
-- **Specs:** 100nF, 50V, X7R, 0402
-- **Notes:** BOOT cap sits between BOOT and SW pins per datasheet. Voltage across cap = ~5.4V (bootstrap charge), NOT 19.8V to GND. C307331 (50V) provides 9.3× derating. DAC decoupling caps (items 28, 32, 33, 35, 41) use C1525 (16V) — fine.
+### 10. Capacitor — 100nF X7R 0603 (BOOT pin)
+- **JLCPCB:** C14663 (Basic)
+- **Mfr:** YAGEO CC0603KRX7R9BB104
+- **Specs:** 100nF, 50V, X7R, 0603
+- **Notes:** BOOT cap sits between BOOT and SW pins per datasheet. Voltage across cap = ~5.4V (bootstrap charge), NOT 19.8V to GND. 50V rating provides 9.3× derating. All 100nF caps on the board now use C14663 (0603).
 
-### 10b. Capacitor — 10µF 25V X5R 0805 (VIN bulk input capacitor)
-- **JLCPCB:** C15850
-- **Mfr:** Samsung CL21A106KAYNNNE
-- **Specs:** 10µF, 25V, X5R, 0805
-- **Notes:** Required per TPS54560 datasheet. Place directly next to U2 VIN pin. Harness inductance causes VIN ringing on switch transitions without local bulk cap. 25V rating confirmed safe for 14.4V automotive VIN.
+### 10b. Capacitor — 4.7µF 50V X7R 1206 (VIN input capacitor)
+- **JLCPCB:** C29823 (Basic)
+- **Mfr:** FH (Guangdong Fenghua) 1206B475K500NT
+- **Specs:** 4.7µF, 50V, X7R, 1206
+- **Stock:** ~620,000
+- **Notes:** WEBENCH recommended 4.7µF 50V for input. Place directly next to U2 VIN pin. 50V rating provides 3× derating above TVS clamp voltage (16V). 1206 package needed for 50V rating at this capacitance.
 
-### 11. Resistor — 15kΩ (R_comp)
-- **JLCPCB:** C25756
-- **Mfr:** UNI-ROYAL 0402WGF1502TCE
-- **Specs:** 15kΩ, 1%, 0402 | Stock: ~2,600,000
+### 11. Resistor — 23.7kΩ (R_comp)
+- **JLCPCB:** C165751 (Extended)
+- **Specs:** 23.7kΩ, 1%, 0603
+- **Notes:** WEBENCH value for 7-16V, 5V/5A, ~1.1MHz.
 
-### 12. Capacitor — 1nF C0G/NP0 0402 (C_comp)
-- **JLCPCB:** C1523
-- **Mfr:** YAGEO CC0402JRNPO9BN102
-- **Specs:** 1nF, 50V, C0G/NP0, 0402 | Stock: ~196,000
-- **Notes:** Loop zero at ~10kHz. MUST be C0G/NP0. (Item 44 is no longer this part — changed to 2.2nF.)
+### 12. Capacitor — 1.8nF C0G/NP0 0603 (C_comp)
+- **JLCPCB:** C97878 (Extended)
+- **Mfr:** Murata GRM1885C1H182JA01D
+- **Specs:** 1.8nF, 50V, C0G/NP0, 0603
+- **Notes:** WEBENCH value for 7-16V, 5V/5A, ~1.1MHz. MUST be C0G/NP0.
 
-### 13. Capacitor — 47pF C0G/NP0 0402 (C_pole)
-- **JLCPCB:** C1567
-- **Mfr:** CCTC TCC0402C0G470J500AT
-- **Specs:** 47pF, 50V, C0G, 0402 | Stock: ~372,000
-- **Notes:** HF pole at ~225kHz. In parallel with R_comp+C_comp to GND.
+### 13. Capacitor — 8.2pF C0G/NP0 0603 (C_comp2)
+- **JLCPCB:** C162249 (Extended)
+- **Mfr:** Murata GRM1885C1H822JA01D
+- **Specs:** 8.2pF, 50V, C0G/NP0, 0603
+- **Notes:** WEBENCH value. HF pole capacitor.
 
 ---
 
@@ -144,10 +142,9 @@ BCM25 driven LOW → D2 reverse biases → EN decays through forward-biased D1 v
 NPN collector pulls EN to ~0.1V when battery < 12V. 4.7kΩ series R on BCM25 limits GPIO current to 0.64mA when UVLO fires. UVLO reliably cuts power when BCM25 is high-Z (Pi halted or crashed). At 4.7kΩ: I_BCM25 = 0.574mA << NPN I_C_max 2.15mA → NPN wins.
 
 ### 14. BAT54CLT1G — Dual Schottky Common Cathode (D1 + D2)
-- **JLCPCB:** C14308
+- **JLCPCB:** C916424 (Extended)
 - **Package:** SOT-23
-- **Mfr:** onsemi
-- **Specs:** 30V, 200mA, Vf=0.8V@100mA, -55 to +125°C
+- **Specs:** 30V, 200mA, Vf=1.0V@100mA, -55 to +125°C
 - **Stock:** ~127,879
 - **Notes:** Pin 1=D1 anode (ACC), pin 3=D2 anode (BCM25), pin 2=EN.
 
@@ -243,9 +240,11 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
 ### 25. Resistor — 10kΩ (R_b2, NPN base divider bottom)
 - **JLCPCB:** C25744 (same as item 8)
 
-### 26. Capacitor — 47µF X5R 0805 (TL431 REF blanking cap)
-- **JLCPCB:** C16780
-- **Notes:** τ = 17.6kΩ × 47µF = 827ms. Handles cold crank ~500ms with margin.
+### 26. Capacitor — 47µF 10V X5R 1206 (TL431 REF blanking cap)
+- **JLCPCB:** C96123 (Basic)
+- **Mfr:** Samsung CL31A476MPHNNNE
+- **Specs:** 47µF, 10V, X5R, 1206
+- **Notes:** τ = 17.6kΩ × 47µF = 827ms. Handles cold crank ~500ms with margin. Same part as output caps (items 5).
 
 ---
 
@@ -256,7 +255,7 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
 - DVDD (3.3V) ← Pi 3.3V rail directly (Pi's own regulator)
 - CPVDD (3.3V) ← Pi 3.3V rail directly (same source as DVDD)
 
-**AGND:** All ground connections in the audio section (U1, U4, J3, C9-C14, C16, C18-C20, C24, R15, R16) use a separate AGND net connected to main GND via a net tie at a single star ground point near the GPIO header.
+**Ground:** All ground connections in the audio section use the shared GND net. AGND was merged into GND for v0.2 — the PCM5122 datasheet confirms shared ground is acceptable. Physical separation between buck converter and DAC sections on the PCB provides noise isolation.
 
 **Control pin wiring (no BOM items — direct traces in schematic):**
 - MODE1 (pin 17) → DGND — selects I2C control mode (MODE1=LOW, MODE2=HIGH)
@@ -322,9 +321,9 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
 ### 38. Resistor — 10kΩ to GND (PCM5122 ADR2 pin 16, I2C address bit 1)
 - **JLCPCB:** C25744 (same as item 8)
 
-### 39. Resistor — 10kΩ to 3.3V (PCM5122 XSMT pin 25)
-- **JLCPCB:** C25744 (same as item 8)
-- **Notes:** XSMT LOW = muted. Pull HIGH ensures audio passes even without driver. hifiberry-dacplus overlay also controls via I2C on boot.
+### 39. XSMT (PCM5122 pin 25) — tied directly to 3.3VA
+- **No component needed** — R14 removed.
+- **Notes:** XSMT tied to 3.3VA keeps DAC always unmuted. PCM5122 has built-in clock halt detection that auto-mutes when I²S clocks stop. If audible pops occur on shutdown, update pigarage.service to stop the audio service and wait ~50ms before cutting power. This lets the DAC detect clock loss and mute before power is removed.
 
 ### 40. Capacitor — 10µF 0805 (VNEG pin 5 decoupling — negative charge pump rail)
 - **JLCPCB:** C15850 (same as item 18)
@@ -344,10 +343,10 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
 - **Specs:** 470Ω, 1%, 0402 | Stock: ~430,000
 - **Notes:** All PCM5122 datasheet performance specs (112dB SNR, -93dB THD+N) are measured with 470Ω + 2.2nF. Provides better out-of-band noise attenuation (~10dB at 500kHz vs ~0dB with 100Ω).
 
-### 44. Capacitor — 2.2nF C0G/NP0 0603 50V (RC filter shunt C, ×2 one per channel) *** CHANGED from 1nF 0402 ***
-- **JLCPCB:** C1604
-- **Mfr:** Murata GCM1885C1H222JA16D
-- **Specs:** 2.2nF, 50V, C0G/NP0, 5%, 0603 | Stock: ~5,300
+### 44. Capacitor — 2.2nF C0G/NP0 0603 50V (RC filter shunt C, ×2 one per channel)
+- **JLCPCB:** C77033 (Extended)
+- **Mfr:** Murata GRM1885C1H222JA01D
+- **Specs:** 2.2nF, 50V, C0G/NP0, 0603
 - **Notes:** fc = 1/(2×π×470×2.2n) = 154kHz. MUST be C0G/NP0 — X7R is voltage-dependent and introduces measurable audio distortion. Fallback: two 1nF C0G 0402 (C113780) in parallel per channel (gives 2.0nF, fc = 170kHz).
 
 ### 45. PJ-320B — 3.5mm TRS Audio Jack
@@ -387,10 +386,11 @@ GPIO current:  3.3V / 50kΩ = 66µA — transistor saturates, GPIO = ~0.1V
 - BCM22 — ILL (illumination / headlights)
 - BCM24 — AUX (spare input, user-defined)
 
-### 46. LTV-817S-TA1-C — Optoisolator ×4
-- **JLCPCB:** C109227
-- **Package:** SMD-4P | Mfr: Lite-On
-- **Specs:** 5kV isolation, 50mA, 70V Vceo, CTR rank C (200–400%) | Stock: ~248,000
+### 46. LTV-847S — Quad Optoisolator (4 channels in one package)
+- **JLCPCB:** C3294670 (Extended)
+- **Package:** SMD-16P (2.54mm pitch) | Mfr: Lite-On
+- **Specs:** 5kV isolation, 50mA, 35V Vceo, CTR 50-600%
+- **Notes:** Replaces 4× individual LTV-817S. Same electrical specs per channel, smaller board footprint, single placement.
 
 ### 47. Resistor — 10kΩ ×4 (car-side LED current limit, all channels)
 - **JLCPCB:** C25744 (same as item 8)

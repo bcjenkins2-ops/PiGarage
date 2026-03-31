@@ -1,5 +1,10 @@
 (sym_lib_table
-  (version 7)
-  (lib (name "PiGarage")(type "KiCad")(uri "${KIPRJMOD}/Libraries/PiGarage.kicad_sym")(options "")(descr "PiGarage custom power symbols"))
-  (lib (name "PCM5122PWR")(type "KiCad")(uri "${KIPRJMOD}/Libraries/PCM5122PWR.kicad_sym")(options "")(descr "TI PCM5122 I2S DAC"))
+	(version 7)
+	(lib (name "PiGarage") (type "KiCad") (uri "${KIPRJMOD}/Libraries/PiGarage.kicad_sym") (options "") (descr "PiGarage custom power symbols"))
+	(lib (name "PCM5122PWR") (type "KiCad") (uri "${KIPRJMOD}/Libraries/PCM5122PWR.kicad_sym") (options "") (descr "TI PCM5122 I2S DAC"))
+	(lib (name "AO4407A") (type "KiCad") (uri "${KIPRJMOD}/Libraries/AO4407A.kicad_sym") (options "") (descr ""))
+	(lib (name "FOD817BSD") (type "KiCad") (uri "${KIPRJMOD}/Libraries/FOD817BSD.kicad_sym") (options "") (descr ""))
+	(lib (name "ADS1115IDGSR") (type "KiCad") (uri "${KIPRJMOD}/Libraries/ADS1115IDGSR.kicad_sym") (options "") (descr ""))
+	(lib (name "LTV-847S") (type "KiCad") (uri "${KIPRJMOD}/Libraries/LTV-847S.kicad_sym") (options "") (descr ""))
+	(lib (name "FXL0630") (type "KiCad") (uri "${KIPRJMOD}/Libraries/FXL0630.kicad_sym") (options "") (descr ""))
 )
