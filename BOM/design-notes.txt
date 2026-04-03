@@ -381,9 +381,9 @@ GPIO current:  3.3V / 50kΩ = 66µA — transistor saturates, GPIO = ~0.1V
 ```
 
 **GPIO assignments:**
-- BCM27 — ACC (ignition sense)
-- BCM17 — REV (reverse gear)
-- BCM22 — ILL (illumination / headlights)
+- BCM17 — ACC (ignition sense)
+- BCM22 — REV (reverse gear)
+- BCM27 — ILL (illumination / headlights)
 - BCM24 — AUX (spare input, user-defined)
 
 ### 46. LTV-847S — Quad Optoisolator (4 channels in one package)
@@ -484,15 +484,15 @@ Total: ~$16 for two complete connector sets with spares. One DigiKey order, no s
 |-----|----------|
 | 2 | I2C SDA (PCM5122 DAC + steering wheel controller) |
 | 3 | I2C SCL (PCM5122 DAC + steering wheel controller) |
-| 17 | REV sense |
+| 17 | ACC sense |
 | 18 | I2S BCLK |
 | 19 | I2S LRCLK |
 | 20 | FREE (Pi PCM_DIN — not used, DAC has no data output) |
 | 21 | I2S DOUT (Pi transmits audio to PCM5122 DIN pin 22) |
-| 22 | ILL sense |
+| 22 | REV sense |
 | 24 | AUX (spare, user-defined) |
 | 25 | Power latch (HIGH = run, LOW = cut power) |
-| 27 | ACC sense |
+| 27 | ILL sense |
 
 ---
 

@@ -11008,7 +11008,7 @@
 		)
 		(uuid "ffbf4352-31af-4ea3-9934-88b21c6c339d")
 	)
-	(label "BCM27"
+	(label "BCM17"
 		(at 68.58 187.96 0)
 		(effects
 			(font
@@ -11048,7 +11048,7 @@
 		)
 		(uuid "0b84b590-a552-44e8-aa55-b9366917a9a8")
 	)
-	(label "BCM17"
+	(label "BCM22"
 		(at 64.77 257.81 0)
 		(effects
 			(font
@@ -11088,7 +11088,7 @@
 		)
 		(uuid "15a4e679-2b03-419d-a889-7be34b6ac7c8")
 	)
-	(label "BCM22"
+	(label "BCM27"
 		(at 66.04 222.25 0)
 		(effects
 			(font

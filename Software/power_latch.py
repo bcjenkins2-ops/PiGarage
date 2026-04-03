@@ -7,7 +7,7 @@ import logging
 import RPi.GPIO as GPIO
 
 # RPiCarPowerHAT pins (BCM)
-PIN_ACC   = 27   # HIGH when ACC present
+PIN_ACC   = 17   # HIGH when ACC present
 PIN_LATCH = 25   # HIGH keeps power latched
 
 # Timings (seconds)
