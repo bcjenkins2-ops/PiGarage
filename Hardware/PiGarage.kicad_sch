@@ -18539,7 +18539,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SMC"
+		(property "Footprint" "Diode_SMD:D_SMB"
 			(at 124.46 27.94 0)
 			(hide yes)
 			(show_name no)

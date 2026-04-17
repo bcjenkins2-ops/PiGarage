@@ -5,7 +5,7 @@
       "Application": "Pcbnew",
       "Version": "10.0.0"
     },
-    "CreationDate": "2026-03-31T15:06:34+11:00"
+    "CreationDate": "2026-04-17T11:48:21+10:00"
   },
   "GeneralSpecs": {
     "ProjectId": {
@@ -57,11 +57,6 @@
     {
       "Path": "PiGarage-Top Overlay.gbr",
       "FileFunction": "Legend,Top",
-      "FilePolarity": "Positive"
-    },
-    {
-      "Path": "PiGarage-Board Layer Stack Bottom Overlay.gbr",
-      "FileFunction": "Legend,Bot",
       "FilePolarity": "Positive"
     },
     {
