@@ -593,7 +593,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "../Images/",
+      "plot": "../Production/",
       "pos_files": "../Production/",
       "specctra_dsn": "",
       "step": "",
