@@ -107,8 +107,8 @@
 		(capping no)
 		(filling no)
 		(pcbplotparams
-			(layerselection 0x00000000_00000000_55555555_55555551)
-			(plot_on_all_layers_selection 0x00000000_00000000_00000008_02000000)
+			(layerselection 0x00000000_00000000_55555555_55555554)
+			(plot_on_all_layers_selection 0x00000000_00000000_00000000_02000000)
 			(disableapertmacros no)
 			(usegerberextensions no)
 			(usegerberattributes yes)
@@ -131,7 +131,7 @@
 			(psa4output no)
 			(plot_black_and_white no)
 			(sketchpadsonfab yes)
-			(plotpadnumbers yes)
+			(plotpadnumbers no)
 			(hidednponfab no)
 			(sketchdnponfab yes)
 			(crossoutdnponfab yes)
@@ -13076,14 +13076,14 @@
 			)
 		)
 	)
-	(footprint "Diode_SMD:D_SMC"
+	(footprint "Diode_SMD:D_SMB"
 		(layer "F.Cu")
 		(uuid "d7495614-7143-444d-ada6-d4643802c241")
 		(at 122.6 59.141679 180)
-		(descr "Diode SMC (DO-214AB)")
-		(tags "Diode SMC (DO-214AB)")
+		(descr "Diode SMB (DO-214AA)")
+		(tags "Diode SMB (DO-214AA)")
 		(property "Reference" "D1"
-			(at -1.9 4.141679 0)
+			(at 0 -3 0)
 			(layer "F.SilkS")
 			(uuid "defc6d7d-8c8b-4abb-a77b-88e95fbf9a1b")
 			(effects
@@ -13094,7 +13094,7 @@
 			)
 		)
 		(property "Value" "SMBJ18CA"
-			(at 0 4.2 0)
+			(at 0 3.1 0)
 			(layer "F.Fab")
 			(uuid "3249b32e-165f-4c51-9daf-ba2135cbe982")
 			(effects
@@ -13143,8 +13143,8 @@
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
-			(start -4.91 3.25)
-			(end 3.6 3.25)
+			(start -3.66 2.15)
+			(end 2.15 2.15)
 			(stroke
 				(width 0.12)
 				(type solid)
@@ -13153,8 +13153,8 @@
 			(uuid "a7ebbe82-9158-4705-86f6-5808758c6a59")
 		)
 		(fp_line
-			(start -4.91 3.25)
-			(end -4.91 -3.25)
+			(start -3.66 -2.15)
+			(end -3.66 2.15)
 			(stroke
 				(width 0.12)
 				(type solid)
@@ -13163,8 +13163,8 @@
 			(uuid "5532a312-69fc-4eaf-b19b-21fccbb099d0")
 		)
 		(fp_line
-			(start -4.91 -3.25)
-			(end 3.6 -3.25)
+			(start -3.66 -2.15)
+			(end 2.15 -2.15)
 			(stroke
 				(width 0.12)
 				(type solid)
@@ -13173,8 +13173,8 @@
 			(uuid "f0f40573-b679-46e2-83ed-b1969eb2c9e9")
 		)
 		(fp_line
-			(start 4.9 3.35)
-			(end -4.9 3.35)
+			(start 3.65 2.25)
+			(end -3.65 2.25)
 			(stroke
 				(width 0.05)
 				(type solid)
@@ -13183,8 +13183,8 @@
 			(uuid "35df6f6c-1c96-44d9-b966-6da9f58e8aad")
 		)
 		(fp_line
-			(start 4.9 -3.35)
-			(end 4.9 3.35)
+			(start 3.65 -2.25)
+			(end 3.65 2.25)
 			(stroke
 				(width 0.05)
 				(type solid)
@@ -13193,8 +13193,8 @@
 			(uuid "14dc5ddf-6c0e-4a8a-abf6-1e4051e7a66f")
 		)
 		(fp_line
-			(start -4.9 3.35)
-			(end -4.9 -3.35)
+			(start -3.65 2.25)
+			(end -3.65 -2.25)
 			(stroke
 				(width 0.05)
 				(type solid)
@@ -13203,8 +13203,8 @@
 			(uuid "19518a25-07ba-493b-9b8c-1efb03f7d6ad")
 		)
 		(fp_line
-			(start -4.9 -3.35)
-			(end 4.9 -3.35)
+			(start -3.65 -2.25)
+			(end 3.65 -2.25)
 			(stroke
 				(width 0.05)
 				(type solid)
@@ -13213,8 +13213,8 @@
 			(uuid "99f72f11-a846-4b22-a79f-4f489452dcd8")
 		)
 		(fp_line
-			(start 3.55 3.1)
-			(end -3.55 3.1)
+			(start 2.3 2)
+			(end -2.3 2)
 			(stroke
 				(width 0.1)
 				(type solid)
@@ -13223,8 +13223,8 @@
 			(uuid "e131b1ec-9a6d-4257-9977-1040f7563f28")
 		)
 		(fp_line
-			(start 3.55 -3.1)
-			(end 3.55 3.1)
+			(start 2.3 -2)
+			(end 2.3 2)
 			(stroke
 				(width 0.1)
 				(type solid)
@@ -13233,8 +13233,8 @@
 			(uuid "f0050d9e-f367-4f2e-8169-d107b561f803")
 		)
 		(fp_line
-			(start 3.55 -3.1)
-			(end -3.55 -3.1)
+			(start 2.3 -2)
+			(end -2.3 -2)
 			(stroke
 				(width 0.1)
 				(type solid)
@@ -13303,8 +13303,8 @@
 			(uuid "ae312481-34db-48e2-81fc-e0a1f02a857f")
 		)
 		(fp_line
-			(start -3.55 3.1)
-			(end -3.55 -3.1)
+			(start -2.3 2)
+			(end -2.3 -2)
 			(stroke
 				(width 0.1)
 				(type solid)
@@ -13313,7 +13313,7 @@
 			(uuid "2d3d84d1-5548-49ac-9a5b-c6bb1e430dbe")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 0 -1.9 0)
+			(at 0 -3 0)
 			(layer "F.Fab")
 			(uuid "a0cb6fef-e2b6-4268-91d8-4178b6c07f67")
 			(effects
@@ -13324,27 +13324,27 @@
 			)
 		)
 		(pad "1" smd roundrect
-			(at -3.4 0 270)
-			(size 3.3 2.5)
+			(at -2.15 0 270)
+			(size 2.5 2.3)
 			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.1)
+			(roundrect_rratio 0.1086956522)
 			(net "Net-(D1-A1)")
 			(pinfunction "A1_1")
 			(pintype "passive")
 			(uuid "2a41bc06-ac13-48ba-a784-d0aaa7a5e3ef")
 		)
 		(pad "2" smd roundrect
-			(at 3.4 0 270)
-			(size 3.3 2.5)
+			(at 2.15 0 270)
+			(size 2.5 2.3)
 			(layers "F.Cu" "F.Mask" "F.Paste")
-			(roundrect_rratio 0.1)
+			(roundrect_rratio 0.1086956522)
 			(net "GND")
 			(pinfunction "A2_2")
 			(pintype "passive")
 			(uuid "9ad77de6-bbf9-4a2a-9ba9-6cf9cd6f8556")
 		)
 		(embedded_fonts no)
-		(model "${KICAD10_3DMODEL_DIR}/Diode_SMD.3dshapes/D_SMC.step"
+		(model "${KICAD10_3DMODEL_DIR}/Diode_SMD.3dshapes/D_SMB.step"
 			(offset
 				(xyz 0 0 0)
 			)
