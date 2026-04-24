@@ -1,5 +1,5 @@
 # PiGarage — Bill of Materials (BOM) Reference
-**Last updated: 2026-03-31 (rev 14 — v0.2 WEBENCH redesign)**
+**Last updated: 2026-04-25 (rev 15 — 0402→0603 passives for JLCPCB assembly)**
 
 All SMT parts assembled by JLCPCB PCBA unless noted.
 
@@ -149,22 +149,22 @@ NPN collector pulls EN to ~0.1V when battery < 12V. 4.7kΩ series R on BCM25 lim
 - **Notes:** Pin 1=D1 anode (ACC), pin 3=D2 anode (BCM25), pin 2=EN.
 
 ### 15. Resistor — 100kΩ (ACC divider top / EN pull-down)
-- **JLCPCB:** C25741
-- **Mfr:** UNI-ROYAL 0402WGF1003TCE
-- **Specs:** 100kΩ, 1%, 0402 | Stock: ~4,000,000
+- **JLCPCB:** C25803
+- **Mfr:** UNI-ROYAL 0603WAF1003T5E
+- **Specs:** 100kΩ, 1%, 0603 | Stock: ~14,800,000
 - **Notes:** ACC 12V → 100k/22k divider → D1. V_divider = 2.16V at 12V. When ACC is off (0V), this resistor + 22kΩ form the EN discharge path through forward-biased D1 (effective R = 22k∥100k = 18kΩ). No dedicated EN-to-GND pull-down exists.
 
 ### 16. Resistor — 22kΩ (ACC divider bottom)
-- **JLCPCB:** C25768
-- **Mfr:** UNI-ROYAL 0402WGF2202TCE
-- **Specs:** 22kΩ, 1%, 0402 | Stock: ~377,000
+- **JLCPCB:** C31850
+- **Mfr:** UNI-ROYAL 0603WAF2202T5E
+- **Specs:** 22kΩ, 1%, 0603 | Stock: ~1,800,000
 - **Notes:** Also used for UVLO TL431 divider bottom (item 23).
 
 ### 17. Resistor — 4.7kΩ (BCM25 series protection)
-- **JLCPCB:** C25900
-- **Mfr:** UNI-ROYAL 0402WGF4701TCE
-- **Specs:** 4.7kΩ, 1%, 0402 | Stock: ~1,000,000+
-- **Notes:** Raised from 1kΩ to ensure UVLO NPN wins with thick margin if BCM25 sticks HIGH. At 1kΩ: NPN barely wins (1.7mA vs 2.15mA at V_EN=1.1V — thin margin). At 4.7kΩ: NPN wins easily (0.36mA vs 2.15mA — thick margin). ✓ GPIO current when UVLO fires: (3.3-0.3)/4.7k = 0.64mA (safer). EN rise time when BCM25 HIGH: τ = 4.7k × 10µF = 47ms (acceptable). C11702 (1kΩ) still used for R_k in UVLO section (item 24).
+- **JLCPCB:** C23162
+- **Mfr:** UNI-ROYAL 0603WAF4701T5E
+- **Specs:** 4.7kΩ, 1%, 0603 | Stock: ~9,100,000
+- **Notes:** Raised from 1kΩ to ensure UVLO NPN wins with thick margin if BCM25 sticks HIGH. At 1kΩ: NPN barely wins (1.7mA vs 2.15mA at V_EN=1.1V — thin margin). At 4.7kΩ: NPN wins easily (0.36mA vs 2.15mA — thick margin). ✓ GPIO current when UVLO fires: (3.3-0.3)/4.7k = 0.64mA (safer). EN rise time when BCM25 HIGH: τ = 4.7k × 10µF = 47ms (acceptable). C21190 (1kΩ) still used for R_k in UVLO section (item 24).
 
 ### 18. Capacitor — 10µF 0805 (EN hold-up / crank ride-through)
 - **JLCPCB:** C15850
@@ -220,25 +220,25 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
 - **Stock:** ~5,492
 
 ### 21. Resistor — 84.5kΩ (TL431 divider top R_a)
-- **JLCPCB:** C26988
-- **Mfr:** UNI-ROYAL 0402WGF8452TCE
-- **Specs:** 84.5kΩ, 1%, 0402 | Stock: ~34,950
+- **JLCPCB:** C23118 (Extended)
+- **Mfr:** UNI-ROYAL 0603WAF8452T5E
+- **Specs:** 84.5kΩ, 1%, 0603 | Stock: ~53,000
 - **Notes:** Sets 12.1V cutoff threshold.
 
 ### 22. Resistor — 22kΩ (TL431 divider bottom R_b)
-- **JLCPCB:** C25768 (same as item 16)
+- **JLCPCB:** C31850 (same as item 16)
 
 ### 23. Resistor — 1kΩ (R_k, TL431 cathode pull-up from 5V)
-- **JLCPCB:** C11702
+- **JLCPCB:** C21190
 - **Notes:** 5V → R_k → TL431 cathode → GND (through TL431 when bat good).
 
 ### 24. Resistor — 47kΩ (R_b1, NPN base divider top)
-- **JLCPCB:** C25792
-- **Mfr:** UNI-ROYAL 0402WGF4702TCE
-- **Specs:** 47kΩ, 1%, 0402 | Stock: ~3,200,000
+- **JLCPCB:** C25819
+- **Mfr:** UNI-ROYAL 0603WAF4702T5E
+- **Specs:** 47kΩ, 1%, 0603 | Stock: ~5,100,000
 
 ### 25. Resistor — 10kΩ (R_b2, NPN base divider bottom)
-- **JLCPCB:** C25744 (same as item 8)
+- **JLCPCB:** C25804 (same as item 8)
 
 ### 26. Capacitor — 47µF 10V X5R 1206 (TL431 REF blanking cap)
 - **JLCPCB:** C96123 (Basic)
@@ -276,8 +276,8 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
   - Pi 4 and older: `dtoverlay=hifiberry-dacplus` (driver auto-detects slave mode)
   - Pi 5: `dtoverlay=hifiberry-dacplus-std` (Pi 5 cannot dynamically switch clock direction; slave must be set at load time. Alternatively: `dtoverlay=hifiberry-dacplus,slave`)
 
-### 28. Capacitor — 100nF X7R 0402 (AVDD decoupling)
-- **JLCPCB:** C1525
+### 28. Capacitor — 100nF X7R 0603 (AVDD decoupling)
+- **JLCPCB:** C14663
 
 ### 29. Capacitor — 10µF 0805 (AVDD bulk)
 - **JLCPCB:** C15850 (same as item 18)
@@ -298,28 +298,28 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
 - **Specs:** 1µF, 10V, X7R, 0402
 - **Notes:** Required per AP2112K datasheet (CIN ≥ 1µF). Place between ferrite bead output (item 30) and LDO VIN pin (item 31). Without this cap, ferrite HF attenuation is degraded and LDO line transient response suffers.
 
-### 32. Capacitor — 100nF X7R 0402 (AVDD LDO output decoupling)
-- **JLCPCB:** C1525
+### 32. Capacitor — 100nF X7R 0603 (AVDD LDO output decoupling)
+- **JLCPCB:** C14663
 
-### 33. Capacitor — 100nF X7R 0402 (DVDD decoupling, Pi 3.3V rail)
-- **JLCPCB:** C1525
+### 33. Capacitor — 100nF X7R 0603 (DVDD decoupling, Pi 3.3V rail)
+- **JLCPCB:** C14663
 
 ### 34. Capacitor — 10µF 0805 (DVDD bulk)
 - **JLCPCB:** C15850 (same as item 18)
 
-### 35. Capacitor — 100nF X7R 0402 (CPVDD decoupling)
-- **JLCPCB:** C1525
+### 35. Capacitor — 100nF X7R 0603 (CPVDD decoupling)
+- **JLCPCB:** C14663
 - **Notes:** CPVDD is DAC charge pump supply input. Sourced from Pi 3.3V rail (NOT 5V — abs max 3.9V).
 
 ### 36. Capacitor — 10µF 0805 (CPVDD bulk)
 - **JLCPCB:** C15850 (same as item 18)
 
 ### 37. Resistor — 10kΩ to DVDD (PCM5122 ADR1 pin 24, I2C address bit 0) *** CHANGED from GND to DVDD ***
-- **JLCPCB:** C25744 (same as item 8)
+- **JLCPCB:** C25804 (same as item 8)
 - **Notes:** MUST NOT float. ADR1=DVDD, ADR2=GND → address 0x4D (matches HiFiBerry DAC+ for maximum overlay/driver compatibility).
 
 ### 38. Resistor — 10kΩ to GND (PCM5122 ADR2 pin 16, I2C address bit 1)
-- **JLCPCB:** C25744 (same as item 8)
+- **JLCPCB:** C25804 (same as item 8)
 
 ### 39. XSMT (PCM5122 pin 25) — tied directly to 3.3VA
 - **No component needed** — R14 removed.
@@ -329,8 +329,8 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
 - **JLCPCB:** C15850 (same as item 18)
 - **Notes:** PCM5122 VNEG pin 5. Negative rail ~-3.3V from charge pump. Required for pump stability.
 
-### 41. Capacitor — 100nF X7R 0402 (LDOO pin 26 decoupling)
-- **JLCPCB:** C1525
+### 41. Capacitor — 100nF X7R 0603 (LDOO pin 26 decoupling)
+- **JLCPCB:** C14663
 - **Notes:** PCM5122 internal 1.8V LDO output pin. Must be decoupled to GND.
 
 ### 42. Capacitor — 1µF X7R 0402 (CAPM/CAPP flying capacitor)
@@ -338,9 +338,9 @@ Engine crank voltage dips (<500ms) do not trigger UVLO. System rides through.
 - **Notes:** Charge pump flying cap. Connected BETWEEN CAPP (pin 2) and CAPM (pin 4) — NOT to GND. Both pins float if this is omitted. VCOM (pin 10): wire to GND directly, NO cap required. Default VREF mode needs no decoupling on VCOM.
 
 ### 43. Resistor — 470Ω 0402 1% (RC filter series R, ×2 one per channel)
-- **JLCPCB:** C25117
-- **Mfr:** UNI-ROYAL 0402WGF4700TCE
-- **Specs:** 470Ω, 1%, 0402 | Stock: ~430,000
+- **JLCPCB:** C23179
+- **Mfr:** UNI-ROYAL 0603WAF4700T5E
+- **Specs:** 470Ω, 1%, 0603 | Stock: ~2,960,000
 - **Notes:** All PCM5122 datasheet performance specs (112dB SNR, -93dB THD+N) are measured with 470Ω + 2.2nF. Provides better out-of-band noise attenuation (~10dB at 500kHz vs ~0dB with 100Ω).
 
 ### 44. Capacitor — 2.2nF C0G/NP0 0603 50V (RC filter shunt C, ×2 one per channel)
@@ -393,11 +393,11 @@ GPIO current:  3.3V / 50kΩ = 66µA — transistor saturates, GPIO = ~0.1V
 - **Notes:** Replaces 4× individual LTV-817S. Same electrical specs per channel, smaller board footprint, single placement.
 
 ### 47. Resistor — 10kΩ ×4 (car-side LED current limit, all channels)
-- **JLCPCB:** C25744 (same as item 8)
+- **JLCPCB:** C25804 (same as item 8)
 - **Notes:** Changed from 1kΩ. LED current = (12-1.2)/10k = 1.08mA. Adequate for FOD817.
 
 ### 48. Capacitor — 100nF ×4 (car-side debounce filter, in parallel with LED)
-- **JLCPCB:** C1525
+- **JLCPCB:** C14663
 - **Notes:** RC filter: τ = 10kΩ × 100nF = 1ms. Filters noise/spikes on car signal. Place across opto LED pins (pin 1 to pin 2).
 
 ### *** NO external pull-up resistors on GPIO side ***
@@ -424,20 +424,20 @@ All four analog inputs (A0–A3) routed to the 4-pin Molex connector (item 51). 
 - **Specs:** 16-bit, 860 SPS, 4-channel MUX, PGA ±0.256V to ±6.144V, I2C, 2V–5.5V supply
 - **Notes:** Shared I2C bus with PCM5122 (BCM2 SDA, BCM3 SCL). Address 0x48 (ADDR to GND). ALRT pin (pin 2) left unconnected — internal pull-up present. Pi on-board 1.8kΩ I2C pull-ups adequate for combined bus. Linux driver: `ads1015` IIO driver or Adafruit_ADS1x15 Python library.
 
-### 53. Capacitor — 100nF X7R 0402 (ADS1115 VDD decoupling)
-- **JLCPCB:** C1525 (same as items 28, 32, 33, 35, 41, 48)
+### 53. Capacitor — 100nF X7R 0603 (ADS1115 VDD decoupling)
+- **JLCPCB:** C14663 (same as items 28, 32, 33, 35, 41, 48)
 - **Notes:** Place directly at ADS1115 VDD pin 8.
 
 ### 54. Resistor — 10kΩ (ADS1115 ADDR to GND)
-- **JLCPCB:** C25744 (same as items 8, 25, 37, 38, 39, 47)
+- **JLCPCB:** C25804 (same as items 8, 25, 37, 38, 39, 47)
 - **Notes:** Sets I2C address to 0x48. Change destination for alternate addresses: VDD→0x49, SDA→0x4A, SCL→0x4B.
 
 ### 55. Resistor — 4.7kΩ ×2 (AIN0 + AIN1 pull-ups to 3.3V, resistor ladder excitation) *** UPDATED ×1→×2 ***
-- **JLCPCB:** C25900 (same as item 17)
+- **JLCPCB:** C23162 (same as item 17)
 - **Notes:** Excitation for resistor ladder inputs on AIN0 and AIN1. No button pressed = input reads 3.3V. Button pressed = voltage divider with ladder resistance gives unique voltage per button. Value gives good spread across typical steering wheel ladder values (330Ω–3.3kΩ). AIN2/AIN3 have no pull-ups by default — populate additional 4.7kΩ if needed for more resistor ladder channels.
 
 ### 56. Resistor — 10kΩ ×4 (A0–A3 series input protection)
-- **JLCPCB:** C25744 (same as item 54)
+- **JLCPCB:** C25804 (same as item 54)
 - **Notes:** One per channel. Limits input current if analog input accidentally exposed to 12V: (12 − 3.6) / 10kΩ = 0.84mA, well below 10mA abs max. Negligible voltage error due to >10MΩ ADC input impedance.
 
 ---
